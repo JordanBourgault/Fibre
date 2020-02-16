@@ -22,8 +22,9 @@ def bessel_functions(l, u, w):
 def print_intersects(l, u, idx):
     intersects = []
     intersect_list = u[idx][::2]
+    print(V)
     for i in range(len(intersect_list)):
-        if abs(intersect_list[i] - intersect_list[i+1]) < 0.1:
+        if intersect_list[i] > V:
             break
         if intersect_list[i] > 0:
             intersects.append(intersect_list[i])

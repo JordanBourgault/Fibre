@@ -19,10 +19,9 @@ def bessel_functions(l, u, w):
         return jv(l, u) / (u * jv(l-1, u)), -kv(l, w) / (w * kv(l-1, w))
 
 
-def print_intersects(l, u, idx):
+def print_intersects(l, u, idx, V):
     intersects = []
     intersect_list = u[idx][::2]
-    print(V)
     for i in range(len(intersect_list)):
         if intersect_list[i] > V:
             break
@@ -41,7 +40,7 @@ def get_values(l, intersects):
         gamma = get_pow(l, intersects[m])
         ref_index.append(n_eff)
         core_pow.append(gamma)
-        st += f'LP_{l}{m} : n_eff = {n_eff}; gamma = {gamma}\n'
+        st += f'LP_{l}{m+1} : n_eff = {n_eff}; gamma = {gamma}\n'
     print(st)
     return ref_index
 
@@ -53,21 +52,25 @@ def get_pow(l, u):
     return gamma
 
 
-l = 0
-while True:
+def get_u(u, w, l, V):
     left, right = bessel_functions(l, u, w)
-    idx = np.argwhere(np.diff(np.sign(left - right))).flatten()
-    u_values = print_intersects(l, u, idx)
-    if not u_values:
-        break
-    get_values(l, u_values)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        idx = np.argwhere(np.diff(np.sign(left - right))).flatten()
+    return print_intersects(l, u, idx, V)
 
-    plt.figure(l)
-    plt.plot(u, left)
-    plt.plot(u, right)
-    plt.title(f'l = {l}')
-    plt.ylim(-5, 5)
 
-    l += 1
+if __name__ == '__main__':
+    l = 0
+    while True:
+        u_values = get_u(u, w, l, V)
+        if not u_values:
+            break
+        get_values(l, u_values)
 
-plt.show()
+        # plt.figure(l)
+        # plt.plot(u, left)
+        # plt.plot(u, right)
+        # plt.title(f'l = {l}')
+        # plt.ylim(-5, 5)
+
+        l += 1

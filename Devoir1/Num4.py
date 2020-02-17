@@ -38,7 +38,7 @@ def guiding_dispersion(mat1, mat2, x, wl):
     n2 = sellmeier(mat1, mat2, 0, wl)
     delta = (n1**2 - n2**2) / (2 * n1**2)
     V_arr = k0 * np.sqrt(n1**2 - n2**2) * a
-    values = np.linspace(0, 10, 500)
+    values = np.linspace(0, 3, 1000)
 
     u = np.array([get_u(values, np.sqrt(V**2 - values**2), 0, V)[0] for V in V_arr])
     w = np.sqrt(V_arr**2 - u**2)
@@ -52,14 +52,15 @@ def guiding_dispersion(mat1, mat2, x, wl):
 
 wl = np.linspace(1e-6, 1.5e-6, 1000)
 D_M = material_dispersion(SiO2, GeO2, wl, 0.0001e-6)
-D_W = guiding_dispersion(SiO2, GeO2, 0.03, wl)
+D_W = guiding_dispersion(SiO2, GeO2, 0.02, wl)
 D = D_M + D_W
 
 plt.plot(wl*1e6, D_M, label='Dispersion matérielle')
 plt.plot(wl*1e6, D_W, label='Dispersion de guidage')
 plt.plot(wl*1e6, D, label='Dispersion totale')
+plt.title(r'2% molaire GeO$_2$')
 plt.ylabel('Dispersion [ps / km nm]')
 plt.xlabel("Longueur d'onde [µm]")
 plt.legend()
-plt.savefig('num4.png')
+plt.savefig('num4_8.png')
 plt.show()

@@ -38,9 +38,9 @@ def guiding_dispersion(mat1, mat2, x, wl):
     n2 = sellmeier(mat1, mat2, 0, wl)
     delta = (n1**2 - n2**2) / (2 * n1**2)
     V_arr = k0 * np.sqrt(n1**2 - n2**2) * a
-    values = np.linspace(0, 3, 1000)
+    values = np.linspace(0, max(V_arr), 1000)
 
-    u = np.array([get_u(values, np.sqrt(V**2 - values**2), 0, V)[0] for V in V_arr])
+    u = np.array([get_u(values, np.sqrt(V**2 - values**2), 0, V)[0][0] for V in V_arr])
     w = np.sqrt(V_arr**2 - u**2)
     psi = (kv(0, w)) ** 2 / (kv(1, w) * kv(-1, w))
 
@@ -50,17 +50,23 @@ def guiding_dispersion(mat1, mat2, x, wl):
     return delta * (material_dispersion(mat1, mat2, wl) * dVb - n2/(c * wl) * VddVb * 1e6)
 
 
-wl = np.linspace(1e-6, 1.5e-6, 1000)
-D_M = material_dispersion(SiO2, GeO2, wl, 0.0001e-6)
-D_W = guiding_dispersion(SiO2, GeO2, 0.02, wl)
-D = D_M + D_W
+if __name__ == '__main__':
+    wl = np.linspace(1e-6, 1.5e-6, 1000)
+    D_M = material_dispersion(SiO2, GeO2, wl, 0.0001e-6)
+    fig = 1
+    for concentration in [0.02, 0.08]:
+        D_W = guiding_dispersion(SiO2, GeO2, concentration, wl)
+        D = D_M + D_W
 
-plt.plot(wl*1e6, D_M, label='Dispersion matérielle')
-plt.plot(wl*1e6, D_W, label='Dispersion de guidage')
-plt.plot(wl*1e6, D, label='Dispersion totale')
-plt.title(r'2% molaire GeO$_2$')
-plt.ylabel('Dispersion [ps / km nm]')
-plt.xlabel("Longueur d'onde [µm]")
-plt.legend()
-plt.savefig('num4_8.png')
-plt.show()
+        plt.figure(fig)
+        fig += 1
+        plt.plot(wl*1e6, D, label='Dispersion totale')
+        plt.plot(wl*1e6, D_M, label='Dispersion matérielle')
+        plt.plot(wl*1e6, D_W, label='Dispersion de guidage')
+        plt.title(f'{concentration*100}% molaire GeO$_2$')
+        plt.ylabel('Dispersion [ps / km nm]')
+        plt.xlabel("Longueur d'onde [µm]")
+        plt.legend()
+        plt.savefig(f'figs/num4_{concentration}.png')
+
+    plt.show()

@@ -64,11 +64,13 @@ def psi(l, w):
 def differential_model(V, u):
     w = np.sqrt(V ** 2 - u ** 2)
     val = (u / V) * (1 - (w / (w+1)))
+    val = np.clip(val, -1e2, 1e2)
     return val
+
 
 # Differential equation approach
 def differential(V):
-    u = solve_ivp(differential_model, [0, V], [0])
+    u = solve_ivp(differential_model, [V, 0], [0])
     return u
 
 
@@ -91,9 +93,6 @@ def miyagi(V):
             break
         l += 1
     return u_arr
-
-
-print(differential(V))
 
 
 # Boucle principale

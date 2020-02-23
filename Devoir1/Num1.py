@@ -75,7 +75,7 @@ def differential(V):
 
 
 # Formule approchée de Miyagi
-def miyagi(V):
+def miyagi(V, return_first=False):
     u_arr = []
     l = 0
     while True:
@@ -84,6 +84,8 @@ def miyagi(V):
         while True:
             u_inf = jn_zeros(l, m)[-1]
             u = u_inf * (V / (V+1)) * (1 - u_inf**2 / (6 * (V+1)**3) - u_inf**4 / (20 * (V+1)**5))
+            if return_first:
+                return u
             if u > V:
                 u_arr.append(sub_u)
                 break

@@ -83,7 +83,7 @@ if __name__ == '__main__':
         plt.xlabel("Longueur d'onde [µm]")
         plt.xlim(wl_range * 1e6)
         plt.legend()
-        plt.savefig(f'figs/num4_{concentration}.pdf')
+        plt.savefig(f'figs/num4_{concentration}.pdf', bbox_inches='tight')
 
         plt.figure(0)
         plt.plot(wl*1e6, T_g*1e6, label=f'{concentration*100}% molaire de GeO$_2$')
@@ -93,6 +93,6 @@ if __name__ == '__main__':
         plt.xlim(wl_range * 1e6)
         plt.ylim([48.75, 49.3])
         plt.legend()
-        plt.savefig('figs/num4_propagation.pdf')
+        plt.savefig('figs/num4_propagation.pdf', bbox_inches='tight')
 
     plt.show()

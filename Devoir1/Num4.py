@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import kv
-from Devoir1.Num1 import get_u
+from Devoir1.Num1 import get_u, miyagi
 
 
 # Params
@@ -23,7 +23,7 @@ def sellmeier(mat1, mat2, x, wl):
     return np.sqrt(n + 1)
 
 
-def material_dispersion(mat1, mat2, wl, derivative_int=0.01e-6):
+def material_dispersion(mat1, mat2, wl, derivative_int=0.0001e-6):
     d1 = (sellmeier(mat1, mat2, 0, wl) - sellmeier(mat1, mat2, 0, wl-derivative_int)) / derivative_int
     d2 = (sellmeier(mat1, mat2, 0, wl+derivative_int) - sellmeier(mat1, mat2, 0, wl)) / derivative_int
     return ((-wl / c) * (d2 - d1) / derivative_int) * 1e6
@@ -37,7 +37,7 @@ def propagation_delay(L, ng2, delta, dVb, n2, P, b):
     return L/c * (ng2 * (1 + delta * dVb) - n2 * delta * P / 2 * (b + dVb))
 
 
-def get_params(mat1, mat2, x, wl, L, derivative_int=0.01e-6):
+def get_params(mat1, mat2, x, wl, L, derivative_int=0.0001e-6):
     k0 = 2 * np.pi / wl
 
     n1 = sellmeier(mat1, mat2, x, wl)
@@ -78,6 +78,7 @@ if __name__ == '__main__':
         plt.plot(wl*1e6, D, label='Dispersion totale')
         plt.plot(wl*1e6, D_M, label='Dispersion matérielle')
         plt.plot(wl*1e6, D_W, label='Dispersion de guidage')
+        plt.hlines(0, wl_range[0]*1e6, wl_range[1]*1e6, linestyles='dashed', linewidth=1)
         plt.title(f'{concentration*100}% molaire GeO$_2$')
         plt.ylabel('Dispersion [ps / km nm]')
         plt.xlabel("Longueur d'onde [µm]")

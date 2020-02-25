@@ -61,17 +61,19 @@ def psi(l, w):
     return (kv(l, w))**2 / (kv(l+1, w) * kv(l-1, w))
 
 
-def differential_model(V, u):
-    w = np.sqrt(V ** 2 - u ** 2)
-    val = (u / V) * (1 - (w / (w+1)))
-    val = np.clip(val, -1e2, 1e2)
-    return val
-
-
-# Differential equation approach
-def differential(V):
-    u = solve_ivp(differential_model, [V, 0], [0])
-    return u
+def caracteristic_eq(V, u, w):
+    l = 0
+    u_arr = []
+    while True:
+        sub_u = []
+        u_values = get_u(u, w, l, V)
+        if not u_values[0].any():
+            break
+        for u_val in u_values[0]:
+            sub_u.append(u_val)
+        u_arr.append(sub_u)
+        l += 1
+    return u_arr
 
 
 # Formule approchée de Miyagi
@@ -97,32 +99,44 @@ def miyagi(V, return_first=False):
     return u_arr
 
 
+def differential_model(u, V, l):
+    with np.errstate(divide='ignore', invalid='ignore'):
+        w = np.sqrt(V ** 2 - u ** 2)
+        val = (u / V) * (1 - psi(l, w))
+    return val
+
+
+def differential_eq(V):
+    V_val = np.linspace(100, 0, 1000)
+    V_index = (np.abs(V_val - V)).argmin()
+    u_arr = []
+    for l in range(5):
+        u_l_mode = []
+        for m in range(1, 4):
+           u_l_mode.append(odeint(differential_model, jn_zeros(l, m)[m-1], V_val, args=(l,))[:, 0][V_index])
+        u_arr.append(u_l_mode)
+    return u_arr
+
+
 # Boucle principale
 if __name__ == '__main__':
-    l = 0
     print('----- Équation caractéristique -----')
-    while True:
-        u_values = get_u(u, w, l, V)
-        if not u_values[0].any():
-            break
-
-        for m, u_val in enumerate(u_values[0], start=1):
+    u_car = caracteristic_eq(V, u, w)
+    for l, u_arr in enumerate(u_car, start=0):
+        for m, u_val in enumerate(u_arr, start=1):
             print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val)}')
         print('\n', end='')
 
-        plt.figure(l)
-        plt.plot(u, u_values[1][0])
-        plt.plot(u, u_values[1][1])
-        plt.title(f'l = {l}')
-        plt.ylim(-2, 5)
-        plt.xlim(0, round(V + 3))
-        l += 1
-
-    print('----- formule approchée de Miyagi -----')
+    print('----- Formule approchée de Miyagi -----')
     u_miyagi = miyagi(V)
     for l, u_arr in enumerate(u_miyagi, start=0):
         for m, u_val in enumerate(u_arr, start=1):
-            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}')
+            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val)}')
         print('\n', end='')
 
-    plt.show()
+    print('----- Équation différentielle -----')
+    u_diff = differential_eq(V)
+    for l, u_arr in enumerate(u_diff, start=0):
+        for m, u_val in enumerate(u_arr, start=1):
+            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val)}')
+        print('\n', end='')

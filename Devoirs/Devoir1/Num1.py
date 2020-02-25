@@ -99,6 +99,7 @@ def miyagi(V, return_first=False):
     return u_arr
 
 
+# Équation différentielle pour les modes LP
 def differential_model(u, V, l):
     with np.errstate(divide='ignore', invalid='ignore'):
         w = np.sqrt(V ** 2 - u ** 2)
@@ -106,6 +107,7 @@ def differential_model(u, V, l):
     return val
 
 
+# Résolution de l'Équation différentielle
 def differential_eq(V):
     V_val = np.linspace(100, 0, 1000)
     V_index = (np.abs(V_val - V)).argmin()

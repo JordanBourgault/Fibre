@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import kv
-from Devoir1.Num1 import get_u, miyagi
-
+from Devoirs.Devoir1.Num1 import get_u
 
 # Params
 SiO2 = {'A': [0.696166, 0.407942, 0.897479],

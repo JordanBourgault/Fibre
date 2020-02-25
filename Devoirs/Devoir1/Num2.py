@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from scipy.special import jv
-from Devoir1.Num1 import miyagi
+from Devoirs.Devoir1.Num1 import miyagi
 import numpy as np
 
 

@@ -16,8 +16,8 @@ from Devoirs.Devoir1.Num4 import sellmeier, SiO2, GeO2
 
 
 # Sections efficaces
-cs_s_abs_data = np.genfromtxt("Num4/abs_ErALP_1550nm.csv")
-cs_s_ems_data = np.genfromtxt("Num4/ems_ErALP_1550nm.csv")
+cs_s_abs_data = np.genfromtxt("abs_ErALP_1550nm.csv")
+cs_s_ems_data = np.genfromtxt("ems_ErALP_1550nm.csv")
 
 # Interpolation des sections efficaces
 cs_s_abs = interp1d(cs_s_abs_data[:, 0], cs_s_abs_data[:, 1], fill_value="extrapolate")
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     plt.xlabel("Longueur d'onde [nm]")
     plt.ylabel("Gain [-]")
     plt.legend(title='P pompe:')
-    plt.savefig('figs/Num4_2.pdf', bbox_inches='tight')
+    plt.savefig('figs/Num4_2.png', bbox_inches='tight')
 
     # Numéro 3
     plt.figure()
@@ -246,7 +246,7 @@ if __name__ == '__main__':
             wl = 1580e-9
             ampli = Amplificateur(5, wl, pump='clad')
             z_sol, Pp_sol, Ps_sol, N_sol = ampli.sol(P_pump, P, 101)
-            gain.append(0.5 * np.log(Ps_sol[-1] / Ps_sol[0]))
+            gain.append(10 * np.log10(Ps_sol[-1] / Ps_sol[0]))
 
         print(P_pump)
         plt.semilogx(P_sig, gain, label=f'{P_pump} W')
@@ -255,8 +255,7 @@ if __name__ == '__main__':
     plt.xlabel("Puissance du signal d'entrée [W]")
     plt.ylabel('Gain G [dB]')
     plt.legend(title='P pompe:')
-    plt.savefig('figs/Num4_3.pdf', bbox_inches='tight')
-    plt.show()
+    plt.savefig('figs/Num4_3.png', bbox_inches='tight')
 
     # Numéro 4
     length = np.linspace(0, 15, 200)
@@ -271,15 +270,15 @@ if __name__ == '__main__':
     for L in length:
         ampli_core = Amplificateur(L, 1540e-9, pump='core')
         z_sol_core, Pp_sol_core, Ps_sol_core, N_sol_core = ampli_core.sol(0.75, 1e-6, 301)
-        gain_core.append(0.5 * np.log(Ps_sol_core[-1] / Ps_sol_core[0]))
+        gain_core.append(10 * np.log10(Ps_sol_core[-1] / Ps_sol_core[0]))
         gamma_core.append(ampli_core.gamma())
-        abs_core.append(0.5 * np.log(Pp_sol_core[-1] / Pp_sol_core[0]))
+        abs_core.append(10 * np.log10(Pp_sol_core[-1] / Pp_sol_core[0]))
 
         ampli_clad = Amplificateur(L, 1540e-9, pump='clad')
         z_sol_clad, Pp_sol_clad, Ps_sol_clad, N_sol_clad = ampli_clad.sol(10, 1e-6, 301)
-        gain_clad.append(0.5 * np.log(Ps_sol_clad[-1] / Ps_sol_clad[0]))
+        gain_clad.append(10 * np.log10(Ps_sol_clad[-1] / Ps_sol_clad[0]))
         gamma_clad.append(ampli_clad.gamma())
-        abs_clad.append(0.5 * np.log(Pp_sol_clad[-1] / Pp_sol_clad[0]))
+        abs_clad.append(10 * np.log10(Pp_sol_clad[-1] / Pp_sol_clad[0]))
         print(L)
 
     plt.figure()
@@ -289,7 +288,7 @@ if __name__ == '__main__':
     plt.xlabel('Longueur de la cavité [m]')
     plt.ylabel('Gain G [dB]')
     plt.xlim([length[0], length[-1]])
-    plt.savefig('figs/Num4_4_G.pdf', bbox_inches='tight')
+    plt.savefig('figs/Num4_4_G.png', bbox_inches='tight')
 
     plt.figure()
     plt.plot(length, gamma_core, label='Coeur')
@@ -298,7 +297,7 @@ if __name__ == '__main__':
     plt.xlabel('Longueur de la cavité [m]')
     plt.ylabel(r'Coefficient de gain $\gamma$ [-]')
     plt.xlim([length[0], length[-1]])
-    plt.savefig('figs/Num4_4_gamma.pdf', bbox_inches='tight')
+    plt.savefig('figs/Num4_4_gamma.png', bbox_inches='tight')
 
     plt.figure()
     plt.plot(length, abs_core, label='Coeur')
@@ -307,6 +306,6 @@ if __name__ == '__main__':
     plt.xlabel('Longueur de la cavité [m]')
     plt.ylabel(r'Absorption de la pompe [dB]')
     plt.xlim([length[0], length[-1]])
-    plt.savefig('figs/Num4_4_abs.pdf', bbox_inches='tight')
+    plt.savefig('figs/Num4_4_abs.png', bbox_inches='tight')
 
     plt.show()

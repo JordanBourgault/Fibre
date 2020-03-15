@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from Laboratoires.utils import read_txt_data
 from scipy.stats import linregress
+from scipy.signal import argrelextrema, savgol_filter
 import numpy as np
 
 
@@ -17,6 +18,7 @@ def theo_ellipticity(theta, delta):
     theta = np.deg2rad(theta)
     psi = np.arcsin(np.sin(2 * theta) * np.sin(delta)) / 2
     return np.tan(psi)
+
 
 def theo_delta(ellipticity):
     return 2 * np.arctan(np.max(np.abs(ellipticity)))
@@ -39,6 +41,7 @@ plt.ylabel('Ellipticité [-]')
 plt.xlabel('Angle de la polarisation incidente [°]')
 plt.xlim([min(theta_array), max(theta_array)])
 plt.legend(loc='upper right')
+plt.savefig('figs/3_1_pince.pdf', bbox_inches='tight')
 
 
 # Sans pince
@@ -56,6 +59,7 @@ plt.ylabel('Ellipticité [-]')
 plt.xlabel('Angle de la polarisation incidente [°]')
 plt.xlim([min(theta_array), max(theta_array)])
 plt.legend(loc='upper right')
+plt.savefig('figs/3_1_no_pince.pdf', bbox_inches='tight')
 print('')
 
 
@@ -77,6 +81,7 @@ plt.ylabel('Ellipticité [-]')
 plt.xlabel('Angle de la polarisation incidente [°]')
 plt.xlim([min(theta_array), max(theta_array)])
 plt.legend(loc='upper right')
+plt.savefig('figs/3_2_no_pince.pdf', bbox_inches='tight')
 
 
 # Lame lambda / 2
@@ -92,6 +97,7 @@ plt.ylabel('Ellipticité [-]')
 plt.xlabel('Angle de la polarisation incidente [°]')
 plt.xlim([min(theta_array), max(theta_array)])
 plt.legend(loc='upper right')
+plt.savefig('figs/3_2_lambda_2.pdf', bbox_inches='tight')
 
 
 # Theta_out vs theta_in
@@ -113,6 +119,45 @@ plt.ylabel('Angle de polarisation à la sortie [°]')
 plt.xlabel('Angle de la boucle [°]')
 plt.text(60, 50, f'y = {round(lin_fit[0], 3)}x + {round(lin_fit[1], 3)}\nR$^2$={round(lin_fit[2], 3)}')
 plt.legend()
+plt.savefig('figs/3_2_theta.pdf', bbox_inches='tight')
 
 
+def normalize(y, y_filter):
+    y_filter -= min(y)
+    y -= min(y)
+    y_filter /= max(y)
+    y /= max(y)
+    return y, y_filter
+
+
+# Battements
+data = np.genfromtxt("data/battements.csv", skip_header=True, delimiter=',')
+data = np.array([[element[0], element[1]] for element in data if 4 < element[0] < 41])
+x = data[:, 0]
+y = data[:, 1]
+
+y_filter = savgol_filter(y, 151, 3)
+y, y_filter = normalize(y, y_filter)
+maxima = argrelextrema(y_filter, np.greater)
+
+ma = [7.472, 13.8766, 20.2184, 26.4032, 32.7136, 37.3915]
+
+ma_i = []
+for i in range(len(x)):
+    if x[i] in ma:
+        ma_i.append(i)
+
+period = (ma[-1] - ma[0])/(len(ma) - 1)
+freq = 1 / period
+print(f'La fréquence des battements est de {freq} mm^-1')
+
+plt.figure()
+plt.plot(x, y, linewidth=1, label='Signal brut')
+plt.plot(x, y_filter, label='Signal filtré')
+plt.plot(ma, y_filter[ma_i], 'x', color='black', label='Maxima')
+plt.ylabel('Intensité normalisée [-]')
+plt.xlabel('Distance z [mm]')
+plt.xlim([x[0], x[-1]])
+plt.legend()
+plt.savefig('figs/battements.pdf', bbox_inches='tight')
 plt.show()

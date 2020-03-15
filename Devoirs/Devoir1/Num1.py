@@ -51,7 +51,7 @@ def get_ref_index(l, u):
     return np.sqrt((k0**2 * n1**2 - (u / a)**2)/(k0**2))
 
 # Calculer la puissance contenue dans le coeur
-def get_gamma(l, u):
+def get_gamma(l, u, V):
     w = np.sqrt(V**2 - u**2)
     return 1 - (u**2 / V**2) * (1 - psi(l, w))
 
@@ -126,19 +126,19 @@ if __name__ == '__main__':
     u_car = caracteristic_eq(V, u, w)
     for l, u_arr in enumerate(u_car, start=0):
         for m, u_val in enumerate(u_arr, start=1):
-            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val)}')
+            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val, V)}')
         print('\n', end='')
 
     print('----- Formule approchée de Miyagi -----')
     u_miyagi = miyagi(V)
     for l, u_arr in enumerate(u_miyagi, start=0):
         for m, u_val in enumerate(u_arr, start=1):
-            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val)}')
+            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val, V)}')
         print('\n', end='')
 
     print('----- Équation différentielle -----')
     u_diff = differential_eq(V)
     for l, u_arr in enumerate(u_diff, start=0):
         for m, u_val in enumerate(u_arr, start=1):
-            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val)}')
+            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val, V)}')
         print('\n', end='')

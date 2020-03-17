@@ -153,6 +153,9 @@ for i in range(len(x)):
         ma_i.append(i)
 
 period = (ma[-1] - ma[0])/(len(ma) - 1)
+birefringence = wl / (period * 1e-3)
+print(f'La biréfringence est de {birefringence}')
+
 freq = 1 / period
 print(f'La fréquence des battements est de {freq} mm^-1')
 
@@ -160,7 +163,7 @@ plt.figure()
 plt.plot(x, y, linewidth=1, label='Signal brut')
 plt.plot(x, y_filter, label='Signal filtré')
 plt.plot(ma, y_filter[ma_i], 'x', color='black', label='Maxima')
-plt.text(30, 0.05, r'$f = $' + f'{round(freq, 4)} ' + r'mm$^{-1}$')
+plt.text(30, 0.05, r'$L_B = $' + f'{round(period, 2)} mm')
 plt.ylabel('Intensité normalisée [-]')
 plt.xlabel('Distance z [mm]')
 plt.xlim([x[0], x[-1]])

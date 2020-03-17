@@ -30,13 +30,14 @@ def theo_delta(ellipticity):
 angle_pol, ellipticity = read_txt_data('data/3-1-pince.txt')
 angle_pol = (angle_pol - 160) * 2       # Conversion de l'angle de la lame demi-onde en angle de polarisation incidente
 delta = theo_delta(ellipticity)
-theta_array = np.linspace(min(angle_pol), max(angle_pol), 1000)
+theta_array = np.linspace(min(angle_pol) - 5, max(angle_pol) + 5, 1000)
 ellipticity_theo = theo_ellipticity(theta_array, delta)
 print(f'Différence de phase delta avec connecteur standard: {round(delta, 4)} rad ({delta / np.pi}π)')
 
 plt.figure()
-plt.plot(angle_pol, ellipticity, '.', label='Courbe expérimentale')
-plt.plot(theta_array, ellipticity_theo, label='Courbe théorique')
+plt.errorbar(angle_pol, ellipticity, xerr=4, yerr=0.01, label='Courbe expérimentale',
+             color='black', fmt='none', zorder=2, elinewidth=1)
+plt.plot(theta_array, ellipticity_theo, label='Courbe théorique', zorder=1)
 plt.ylabel('Ellipticité [-]')
 plt.xlabel('Angle de la polarisation incidente [°]')
 plt.xlim([min(theta_array), max(theta_array)])
@@ -48,13 +49,14 @@ plt.savefig('figs/3_1_pince.pdf', bbox_inches='tight')
 angle_pol_reduced_p, ellipticity_reduced_p = read_txt_data('data/3-1-nopince.txt')
 angle_pol_reduced_p = (angle_pol_reduced_p - 140) * 2
 delta_reduced_p = theo_delta(ellipticity_reduced_p)
-theta_array = np.linspace(min(angle_pol_reduced_p), max(angle_pol_reduced_p), 1000)
+theta_array = np.linspace(min(angle_pol_reduced_p) - 5, max(angle_pol_reduced_p) + 5, 1000)
 ellipticity_theo_reduced_p = theo_ellipticity(theta_array, delta_reduced_p)
 print(f'Différence de phase delta avec pression réduite: {round(delta_reduced_p, 4)} rad ({delta_reduced_p / np.pi}π)')
 
 plt.figure()
-plt.plot(angle_pol_reduced_p, ellipticity_reduced_p, '.', label='Courbe expérimentale')
-plt.plot(theta_array, ellipticity_theo_reduced_p, label='Courbe théorique')
+plt.errorbar(angle_pol_reduced_p, ellipticity_reduced_p, xerr=4, yerr=0.01, label='Courbe expérimentale',
+             color='black', fmt='none', zorder=2, elinewidth=1)
+plt.plot(theta_array, ellipticity_theo_reduced_p, label='Courbe théorique', zorder=1)
 plt.ylabel('Ellipticité [-]')
 plt.xlabel('Angle de la polarisation incidente [°]')
 plt.xlim([min(theta_array), max(theta_array)])
@@ -71,12 +73,13 @@ print(f'Rayon de la boucle pour lambda/4: {round(R_l4 * 100, 4)} cm')
 
 angle_pol_l4, ellipticity_l4 = read_txt_data('data/3-2-nopince.txt')
 angle_pol_l4 = (angle_pol_l4 - 55) * 2
-theta_array = np.linspace(min(angle_pol_l4), max(angle_pol_l4), 1000)
+theta_array = np.linspace(min(angle_pol_l4) -5, max(angle_pol_l4) + 5, 1000)
 delta_l4_theo = np.pi / 2       # On pose un déphasage théorique de pi / 2
 
 plt.figure()
-plt.plot(angle_pol_l4, ellipticity_l4, '.', label='Courbe expérimentale')
-plt.plot(theta_array, theo_ellipticity(theta_array, delta_l4_theo), label='Courbe théorique')
+plt.errorbar(angle_pol_l4, ellipticity_l4, xerr=4, yerr=0.01, label='Courbe expérimentale',
+             color='black', fmt='none', zorder=2, elinewidth=1)
+plt.plot(theta_array, theo_ellipticity(theta_array, delta_l4_theo), label='Courbe théorique', zorder=1)
 plt.ylabel('Ellipticité [-]')
 plt.xlabel('Angle de la polarisation incidente [°]')
 plt.xlim([min(theta_array), max(theta_array)])
@@ -87,12 +90,13 @@ plt.savefig('figs/3_2_no_pince.pdf', bbox_inches='tight')
 # Lame lambda / 2
 angle_pol_l2, ellipticity_l2 = read_txt_data('data/3-2-l2.txt')
 angle_pol_l2 = (angle_pol_l2 - 90) * 2
-theta_array = np.linspace(min(angle_pol_l2), max(angle_pol_l2), 1000)
+theta_array = np.linspace(min(angle_pol_l2)-5, max(angle_pol_l2)+5, 1000)
 delta_l2_theo = np.pi       # On pose un déphasage théorique de pi
 
 plt.figure()
-plt.plot(angle_pol_l2, ellipticity_l2, '.', label='Courbe expérimentale')
-plt.plot(theta_array, theo_ellipticity(theta_array, delta_l2_theo), label='Courbe théorique')
+plt.errorbar(angle_pol_l2, ellipticity_l2, xerr=4, yerr=0.01, label='Courbe expérimentale',
+             color='black', fmt='none', zorder=2, elinewidth=1)
+plt.plot(theta_array, theo_ellipticity(theta_array, delta_l2_theo), label='Courbe théorique', zorder=1)
 plt.ylabel('Ellipticité [-]')
 plt.xlabel('Angle de la polarisation incidente [°]')
 plt.xlim([min(theta_array), max(theta_array)])
@@ -113,15 +117,18 @@ theta_out_theo = lin_fit[0] * theta_array + lin_fit[1]
 
 
 plt.figure()
-plt.plot(theta_in, theta_out, '.', label='Courbe expérimentale')
-plt.plot(theta_array, theta_out_theo, label='Fit linéaire')
+plt.errorbar(theta_in, theta_out, xerr=2, yerr=1, label='Courbe expérimentale',
+             color='black', fmt='none', zorder=2, elinewidth=1)
+plt.plot(theta_array, theta_out_theo, label='Fit linéaire', zorder=1)
 plt.ylabel('Angle de polarisation à la sortie [°]')
 plt.xlabel('Angle de la boucle [°]')
+plt.xlim([3, 92])
 plt.text(60, 50, f'y = {round(lin_fit[0], 3)}x + {round(lin_fit[1], 3)}\nR$^2$={round(lin_fit[2], 3)}')
 plt.legend()
 plt.savefig('figs/3_2_theta.pdf', bbox_inches='tight')
 
 
+# Battements
 def normalize(y, y_filter):
     y_filter -= min(y)
     y -= min(y)
@@ -129,8 +136,6 @@ def normalize(y, y_filter):
     y /= max(y)
     return y, y_filter
 
-
-# Battements
 data = np.genfromtxt("data/battements.csv", skip_header=True, delimiter=',')
 data = np.array([[element[0], element[1]] for element in data if 4 < element[0] < 41])
 x = data[:, 0]
@@ -155,6 +160,7 @@ plt.figure()
 plt.plot(x, y, linewidth=1, label='Signal brut')
 plt.plot(x, y_filter, label='Signal filtré')
 plt.plot(ma, y_filter[ma_i], 'x', color='black', label='Maxima')
+plt.text(30, 0.05, r'$f = $' + f'{round(freq, 4)} ' + r'mm$^{-1}$')
 plt.ylabel('Intensité normalisée [-]')
 plt.xlabel('Distance z [mm]')
 plt.xlim([x[0], x[-1]])

@@ -46,7 +46,7 @@ def get_u(u, w, l, V):
 
 
 # Trouver les valeurs d'indice de réfraction effective et de gamma en fonction de u
-def get_ref_index(l, u):
+def get_ref_index(u, k0, n1, a):
     # Calculer n_eff
     return np.sqrt((k0**2 * n1**2 - (u / a)**2)/(k0**2))
 
@@ -126,19 +126,19 @@ if __name__ == '__main__':
     u_car = caracteristic_eq(V, u, w)
     for l, u_arr in enumerate(u_car, start=0):
         for m, u_val in enumerate(u_arr, start=1):
-            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val, V)}')
+            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(u_val, k0, n1, a)}; gamma = {get_gamma(l, u_val, V)}')
         print('\n', end='')
 
     print('----- Formule approchée de Miyagi -----')
     u_miyagi = miyagi(V)
     for l, u_arr in enumerate(u_miyagi, start=0):
         for m, u_val in enumerate(u_arr, start=1):
-            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val, V)}')
+            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(u_val, k0, n1, a)}; gamma = {get_gamma(l, u_val, V)}')
         print('\n', end='')
 
     print('----- Équation différentielle -----')
     u_diff = differential_eq(V)
     for l, u_arr in enumerate(u_diff, start=0):
         for m, u_val in enumerate(u_arr, start=1):
-            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(l, u_val)}; gamma = {get_gamma(l, u_val, V)}')
+            print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(u_val, k0, n1, a)}; gamma = {get_gamma(l, u_val, V)}')
         print('\n', end='')

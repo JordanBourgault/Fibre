@@ -16,8 +16,8 @@ from Devoirs.Devoir1.Num4 import sellmeier, SiO2, GeO2
 
 
 # Sections efficaces
-cs_s_abs_data = np.genfromtxt("abs_ErALP_1550nm.csv")
-cs_s_ems_data = np.genfromtxt("ems_ErALP_1550nm.csv")
+cs_s_abs_data = np.genfromtxt("Num4/abs_ErALP_1550nm.csv")
+cs_s_ems_data = np.genfromtxt("Num4/ems_ErALP_1550nm.csv")
 
 # Interpolation des sections efficaces
 cs_s_abs = interp1d(cs_s_abs_data[:, 0], cs_s_abs_data[:, 1], fill_value="extrapolate")
@@ -87,7 +87,9 @@ class Amplificateur(object):
         k0 = 2 * np.pi / lambda_i
         V = k0 * NA * self.ac
         u = miyagi(V, True)
-        return get_gamma(0, u, V)
+        gamma = get_gamma(0, u, V)
+        print(gamma)
+        return gamma
 
     def sol(self, Pp_launch, Ps_launch, num_elements):
         """Cette fonction intègre les équations de puissance élément par élément dans
@@ -119,11 +121,11 @@ class Amplificateur(object):
         # assignation des valeurs à z=0
         Pp_sol[0] = Pp_launch
         Ps_sol[0] = Ps_launch
-        N_sol[0,:] = self.sol_eq_niv(Pp_launch, Ps_launch)
+        N_sol[0, :] = self.sol_eq_niv(Pp_launch, Ps_launch)
         # Itérations de 0 à L pour trouver les solutions des équations de niveau
         # et de puissance
         for i in range(1, len(z_sol)):
-            self.Pp = self._Pp() # Ici on intègre la puissance précédente pour obtenir la puissance suivante
+            self.Pp = self._Pp()        # Ici on intègre la puissance précédente pour obtenir la puissance suivante
             self.Ps = self._Ps()
             Pp_sol[i] = self.Pp
             Ps_sol[i] = self.Ps
@@ -201,7 +203,7 @@ class Amplificateur(object):
         return -self.N[1]/self.tau2 + self.N[2]/self.tau3 - self.rs - 2 * self.w22 * self.N[1]**2
 
     def _zero(self):
-        return self.Ntot - sum(self.N)
+        return self.Ntot - (self.N[0] + self.N[1] + self.N[2] + self.N[3])
 
     # Intégration de la puissance de pompe et du signal
     def _Pp(self):
@@ -210,7 +212,7 @@ class Amplificateur(object):
 
     def _Ps(self):
         return self.Ps * np.exp((self.gamma_s * (self.sigma_ems * self.N[1] - self.sigma_abs * self.N[0])
-                                 - self.alpha_p) * self.dz)
+                                 - self.alpha_s) * self.dz)
 
     def gamma(self):
         return self.sigma_ems * self.N[1] - self.sigma_abs * self.N[0]
@@ -224,7 +226,7 @@ if __name__ == '__main__':
         gain = []
         for wl in wavelength:
             ampli = Amplificateur(1, wl, pump='clad')
-            z_sol, Pp_sol, Ps_sol, N_sol = ampli.sol(P_pump, 0, 2)
+            z_sol, Pp_sol, Ps_sol, N_sol = ampli.sol(P_pump, 0, 10)
             current_gain = ampli.gamma()
             gain.append(current_gain)
 
@@ -235,17 +237,16 @@ if __name__ == '__main__':
     plt.xlabel("Longueur d'onde [nm]")
     plt.ylabel("Gain [-]")
     plt.legend(title='P pompe:')
-    plt.savefig('figs/Num4_2.png', bbox_inches='tight')
+    plt.savefig('figs/Num4_2.pdf', bbox_inches='tight')
 
     # Numéro 3
     plt.figure()
+    ampli = Amplificateur(5, 1580e-9, pump='clad')
     for P_pump in [1, 2, 4, 6, 8, 10]:
         gain = []
         P_sig = np.logspace(-9, 1, 150)
         for P in P_sig:
-            wl = 1580e-9
-            ampli = Amplificateur(5, wl, pump='clad')
-            z_sol, Pp_sol, Ps_sol, N_sol = ampli.sol(P_pump, P, 101)
+            z_sol, Pp_sol, Ps_sol, N_sol = ampli.sol(P_pump, P, 301)
             gain.append(10 * np.log10(Ps_sol[-1] / Ps_sol[0]))
 
         print(P_pump)
@@ -255,7 +256,7 @@ if __name__ == '__main__':
     plt.xlabel("Puissance du signal d'entrée [W]")
     plt.ylabel('Gain G [dB]')
     plt.legend(title='P pompe:')
-    plt.savefig('figs/Num4_3.png', bbox_inches='tight')
+    plt.savefig('figs/Num4_3.pdf', bbox_inches='tight')
 
     # Numéro 4
     length = np.linspace(0, 15, 200)
@@ -288,7 +289,7 @@ if __name__ == '__main__':
     plt.xlabel('Longueur de la cavité [m]')
     plt.ylabel('Gain G [dB]')
     plt.xlim([length[0], length[-1]])
-    plt.savefig('figs/Num4_4_G.png', bbox_inches='tight')
+    plt.savefig('figs/Num4_4_G.pdf', bbox_inches='tight')
 
     plt.figure()
     plt.plot(length, gamma_core, label='Coeur')
@@ -297,7 +298,7 @@ if __name__ == '__main__':
     plt.xlabel('Longueur de la cavité [m]')
     plt.ylabel(r'Coefficient de gain $\gamma$ [-]')
     plt.xlim([length[0], length[-1]])
-    plt.savefig('figs/Num4_4_gamma.png', bbox_inches='tight')
+    plt.savefig('figs/Num4_4_gamma.pdf', bbox_inches='tight')
 
     plt.figure()
     plt.plot(length, abs_core, label='Coeur')
@@ -306,6 +307,6 @@ if __name__ == '__main__':
     plt.xlabel('Longueur de la cavité [m]')
     plt.ylabel(r'Absorption de la pompe [dB]')
     plt.xlim([length[0], length[-1]])
-    plt.savefig('figs/Num4_4_abs.png', bbox_inches='tight')
+    plt.savefig('figs/Num4_4_abs.pdf', bbox_inches='tight')
 
     plt.show()

@@ -28,7 +28,10 @@ def material_dispersion(mat1, mat2, wl, derivative_int=0.0001e-6):
     return ((-wl / c) * (d2 - d1) / derivative_int) * 1e6
 
 
-def guiding_dispersion(mat1, mat2, delta, n2, dVb, VddVb):
+def guiding_dispersion(mat1, mat2, delta, n2, u, w, V, wl):
+    psi = (kv(0, w)) ** 2 / (kv(1, w) * kv(-1, w))
+    dVb = 1 - (u/V)**2 * (1 - 2*psi)
+    VddVb = 2*(u/V)**2 * (psi*(1 - 2*psi) + 2/w*(w**2 + u**2 * psi) * np.sqrt(psi) * (psi + 1/w * np.sqrt(psi) - 1))
     return delta * (material_dispersion(mat1, mat2, wl) * dVb - n2/(c * wl) * VddVb * 1e6)
 
 
@@ -56,11 +59,8 @@ def get_params(mat1, mat2, x, wl, L, derivative_int=0.0001e-6):
     w = np.sqrt(V_arr**2 - u**2)
     b = 1 - (u ** 2 / V_arr ** 2)
     psi = (kv(0, w)) ** 2 / (kv(1, w) * kv(-1, w))
-
-    dVb = 1 - (u/V_arr)**2 * (1 - 2*psi)
-    VddVb = 2*(u/V_arr)**2 * (psi*(1 - 2*psi) + 2/w*(w**2 + u**2 * psi) * np.sqrt(psi) * (psi + 1/w * np.sqrt(psi) - 1))
-
-    return guiding_dispersion(mat1, mat2, delta, n2, dVb, VddVb), propagation_delay(L, ng2, delta, dVb, n2, P, b)
+    dVb = 1 - (u / V_arr) ** 2 * (1 - 2 * psi)
+    return guiding_dispersion(mat1, mat2, delta, n2, u, w, V_arr, wl), propagation_delay(L, ng2, delta, dVb, n2, P, b)
 
 
 if __name__ == '__main__':

@@ -88,7 +88,7 @@ def miyagi(V, return_first=False):
             u = u_inf * (V / (V+1)) * (1 - u_inf**2 / (6 * (V+1)**3) - u_inf**4 / (20 * (V+1)**5))
             if return_first:
                 return u
-            if u > V:
+            if abs(u) >= V or np.sign(u) == -1:
                 u_arr.append(sub_u)
                 break
             sub_u.append(u)
@@ -131,6 +131,7 @@ if __name__ == '__main__':
 
     print('----- Formule approchée de Miyagi -----')
     u_miyagi = miyagi(V)
+    print(u_miyagi)
     for l, u_arr in enumerate(u_miyagi, start=0):
         for m, u_val in enumerate(u_arr, start=1):
             print(f'LP_{l}{m}: u = {u_val}; n_eff = {get_ref_index(u_val, k0, n1, a)}; gamma = {get_gamma(l, u_val, V)}')

@@ -1,8 +1,12 @@
 from Laboratoires.utils import read_txt_data
+from Devoirs.Devoir1.Num4 import sellmeier, SiO2
+from Devoirs.Devoir1.Num1 import miyagi
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 from scipy.signal import argrelmax
+from scipy.special import kv
 
 
 # Definition de la fonction gaussienne
@@ -15,12 +19,17 @@ x, x_err, I, I_err = read_txt_data('data/fondamental.txt')
 
 # Fit des donnees experimentaes avec le modele de fonction gaussienne
 fit_params, cov = curve_fit(gaussian, x, I)
+print(f'Les parametres de la gaussienne sont: {fit_params}')
 x_fit = np.linspace(min(x), max(x), 1000)
 I_fit = gaussian(x_fit, *fit_params)
 
-# Recentrage des donnees pour que la gaussienne soit centree
+
+# Recentrage et normalisation des donnees pour que la gaussienne soit centree et normalisee
 x -= fit_params[1]
 x_fit -= fit_params[1]
+I /= fit_params[0]
+I_err /= fit_params[0]
+I_fit /= fit_params[0]
 
 # Calcul de la largeur de la gaussienne
 height = 1 / np.e**2
@@ -32,11 +41,20 @@ L = 45
 theta = np.arctan(width / L)
 print(f'La divergence est de {round(theta, 4)} rad')
 
-# Calcul du rayon du coeur de la fibre
+# Calcul du rayon du l'etranglement du faisceau
 lambda_0 = 632.8e-9
 n = 1
-r = lambda_0 / (np.tan(theta) * np.pi * n)
-print(f'Le diametre du coeur est de {round(r * 1e6 * 2, 4)} um')
+w_0 = lambda_0 / (np.tan(theta) * np.pi * n)
+print(f"La taille de l'etranglement est de {round(w_0 * 1e6, 4)} um")
+
+# Calcul du rayon de la fibre
+lambda_c = 575e-9
+V_c = 2.4048
+V = V_c * lambda_c / lambda_0
+print(f'V = {V}')
+
+a = w_0 / (0.65 + 1.619 / (V**(3/2)) + 2.879 / V**6)
+print(f'Le rayon de la fibre est de {a * 1e6} um')
 
 # Creation de la figure
 plt.figure()
@@ -45,9 +63,9 @@ plt.errorbar(x, I, xerr=x_err, yerr=I_err, label='Donnees exp.',
 plt.plot(x_fit, I_fit, label='Fit gaussien')
 plt.xlabel('Position relative [mm]')
 plt.xlim([-max(x), max(x)])
-plt.ylabel(r'Intensite [$\mu$W]')
+plt.ylabel(r'Intensite normalisee [-]')
 plt.legend()
-plt.savefig('figs/mode_fondamental.pdf')
+plt.savefig('figs/mode_fondamental.pdf', bbox_inches='tight')
 
 
 # Extraction des donnees experimentales du patron en couplage
@@ -74,7 +92,23 @@ plt.errorbar(x_coup, I_coup, xerr=x_coup_err, yerr=I_coup_err, label='Donnees ex
              color='black', fmt='none', elinewidth=1, capsize=1.5)
 plt.xlabel('Position relative [mm]')
 plt.xlim([min(x_coup), max(x_coup)])
-plt.ylabel(r'Intensite [$\mu$W]')
-plt.savefig('figs/couplage.pdf')
+plt.ylabel(r'Intensite [uW]')
+plt.savefig('figs/couplage.pdf', bbox_inches='tight')
+
+
+# Calcul du coefficient de couplage
+NA = V * lambda_0 / (2 * np.pi * a)
+n2 = sellmeier(SiO2, SiO2, 0, lambda_0)
+n1 = np.sqrt(NA**2 + n2**2)
+delta = (n1**2 - n2**2) / (2 * n1**2)
+u = miyagi(V, True)
+w = np.sqrt(V**2 - u**2)
+
+C = np.sqrt(2 * delta) * u**2 * kv(0, w * d / a) / (a * V**3 * (kv(1, w))**2)
+print(f'Le coefficient de couplage est de {round(C, 3)} m^-1')
+
+# Calcul de la longueur de couplage
+L_c = np.pi / (2 * C)
+print(f'La longueur de couplage est de {round(L_c * 1e2, 3)} cm')
 
 plt.show()

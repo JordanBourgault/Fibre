@@ -111,4 +111,16 @@ print(f'Le coefficient de couplage est de {round(C, 3)} m^-1')
 L_c = np.pi / (2 * C)
 print(f'La longueur de couplage est de {round(L_c * 1e2, 3)} cm')
 
+
+# Calcul du coefficient de coupage obtenu par Valle et Drolet
+a_real = 1.9e-6
+d_real = 9.9e-6
+NA_real = V * lambda_0 / (2 * np.pi * a_real)
+n1_real = np.sqrt(NA_real**2 + n2**2)
+delta_real = (n1_real**2 - n2**2) / (2 * n1_real**2)
+C_real = np.sqrt(2 * delta_real) * u**2 * kv(0, w * d_real / a_real) / (a_real * V**3 * (kv(1, w))**2)
+print(f'Le coefficient de couplage obtenu par Valle et Drolet est de {round(C_real, 3)} m^-1')
+L_c_real = np.pi / (2 * C_real)
+print(f'La longueur de couplage obtenu par Valle et Drolet est de {round(L_c_real * 1e2, 3)} cm')
+
 plt.show()

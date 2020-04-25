@@ -99,7 +99,7 @@ plt.ylabel("Puissance sortie EVOA [µW]")
 plt.savefig('figs/3.pdf')
 
 # 3.1
-attenuation = 10 * np.log10(P / P[0])
+attenuation = 10 * np.log10(P / 790)
 plt.figure()
 plt.plot(V, attenuation, '.', color='black')
 plt.xlim((min(V), max(V)))
@@ -123,6 +123,15 @@ plt.xlabel("Longueur d'onde [nm]")
 plt.ylabel("Puissance optique [mW/nm]")
 plt.legend()
 plt.savefig('figs/5.1.pdf')
+
+# 5 absorption
+P_out = 5.1
+P_in = 67.8
+beta = 0.8511
+l = 20
+absorption = - np.log(P_out / (beta * P_in)) / l
+print('5')
+print(f"Le coefficient d'absorption est {round(absorption, 3)} m^-1")
 
 # 6.1
 wl, A = read_txt_data('data/6.1.txt')

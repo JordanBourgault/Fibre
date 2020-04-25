@@ -69,7 +69,7 @@ plt.gca().ticklabel_format(axis='both', style='plain', useOffset=False)
 plt.xticks(ticks)
 plt.legend()
 plt.xlabel("Courant [mA]")
-plt.ylabel("Puissance [µW]")
+plt.ylabel("Puissance [mW]")
 plt.savefig('figs/2.1.pdf')
 
 # 2.2
@@ -108,7 +108,7 @@ plt.gca().ticklabel_format(axis='both', style='plain', useOffset=False)
 plt.xticks(ticks, np.round(ticks, 1))
 
 plt.xlabel("Tension [V]")
-plt.ylabel("Atténuation de l’EVOA [dB]")
+plt.ylabel("Atténuation de l'EVOA [dB]")
 plt.savefig('figs/3.1.pdf')
 
 # 5.1
